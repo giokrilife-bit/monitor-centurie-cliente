@@ -220,15 +220,90 @@ function parseCSV(t){const rows=[];let r=[],c="",q=false;
 
 /* ============ Dati ============ */
 let DATA=[],MODE="demo";
+
 function ingest(csvRows,hint){
-  const hd=csvRows[0].map(h=>{
-    const m=String(h).trim().match(/^([A-Z]\d+[a-z]?)(?:\.|\s|$)/); const sub=String(h).match(/\[(.+)\]\s*$/);
-    return m?(sub?m[1]+"|"+sub[1].trim():m[1]):null});
-  const q=hint||(hd.includes("G1")?"Q1":hd.includes("I1")?"Q2":hd.includes("M3")?"Q3":null);
-  if(!q)return 0;
-  const out=[];
-  for(const r of csvRows.slice(1)){const o={_q:q};hd.forEach((k,i)=>{if(k)o[k]=(r[i]||"").trim()});out.push(o)}
-  return out}
+  if(!csvRows || csvRows.length < 2) return [];
+
+  const parsed = csvRows[0].map(h => {
+    const clean = String(h || "").replace(/^\uFEFF/,"").trim();
+    const m = clean.match(/^([A-Z]\d+[a-z]?)(?:\.|\s|$)/);
+    const sub = clean.match(/\[(.+)\]\s*$/);
+    return m ? {
+      code: m[1],
+      aspect: sub ? sub[1].trim() : null
+    } : null;
+  });
+
+  const codes = parsed.filter(Boolean).map(x => x.code);
+  const q = hint ||
+    (codes.includes("G1") ? "Q1" :
+     codes.includes("I1") ? "Q2" :
+     codes.includes("M2b") ? "Q3" : null);
+
+  if(!q) return [];
+
+  const common = {
+    A1:"A1", A2:"A2", A3:"A3", A4:"A4",
+    C1:"C1", C2:"C3", C3:"C4",
+    C4:"C5", C5:"C6", C6:"C7"
+  };
+
+  const specific = {
+    Q1:{
+      G1:"G1", G2:"G2", G3:"G3", G4:"G4",
+      G5:"G5", G6:"G6", G7:"G7", G8:"G8",
+      G9:"G9b", G10:"G10", G11:"G11",
+      G12:"G12", G13:"G13"
+    },
+    Q2:{
+      I1:"I1", I2:"I2", I3:"I3", I5:"I5",
+      I6a:"I6a", I6b:"I6b",
+      I7a:"I7a", I7b:"I7b",
+      I11:"I11", I14:"I14"
+    },
+    Q3:{
+      M2b:"M1", M3:"M2", M4:"M3",
+      M6:"M5", M7:"M6",
+      M8a:"M7a", M8b:"M7b", M9a:"M8"
+    }
+  };
+
+  const out = [];
+
+  for(const row of csvRows.slice(1)){
+    if(!row.some(v => String(v || "").trim())) continue;
+
+    const o = {_q:q};
+
+    parsed.forEach((h,i) => {
+      if(!h) return;
+
+      const value = String(row[i] || "").trim();
+      if(!value) return;
+
+      if(q === "Q3" && h.code === "M4b"){
+        o._M4b = value;
+        return;
+      }
+
+      const target = common[h.code] ||
+        (specific[q] && specific[q][h.code]);
+
+      if(!target) return;
+
+      o[h.aspect ? target + "|" + h.aspect : target] = value;
+    });
+
+    if(q === "Q3" && o.M3 && o._M4b){
+      o.M3 = o.M3 + "; " + o._M4b;
+    }
+
+    out.push(o);
+  }
+
+  return out;
+}
+
 function hintFrom(name){const n=name.toLowerCase();return /q1|galleria/.test(n)?"Q1":/q2|iper/.test(n)?"Q2":/q3|mercat/.test(n)?"Q3":null}
 function seg(r){const c=r.C1||"";return /Ogni giorno|Più volte a settimana/.test(c)?"Abituali (almeno settimanale)":/Più volte al mese/.test(c)?"Regolari (mensile)":/Ogni tanto/.test(c)?"Occasionali":/Non ci vado/.test(c)?"Non frequentatori":""}
 
