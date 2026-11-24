@@ -318,7 +318,22 @@ function demo(){
   const mk=(q,n)=>{for(let i=0;i<n;i++){const o={_q:q};const m3=q==="Q3";
     common.forEach(k=>{const d=D[k];const w=(m3&&d.w3)?d.w3:d.w;o[k]=d.m?multi(d.o,w,d.max||2):pick(d.o,w)});
     if(m3&&!/Non frequento/.test(o.C3))o.C3=o.C3;
-    Q_BY[q].forEach(k=>{const d=D[k];if(common.includes(k))return;o[k]=d.m?multi(d.o,d.w,d.max||2):pick(d.o,d.w)});
+    Q_BY[q].forEach(k=>{
+  const d=D[k];
+  if(common.includes(k))return;
+
+  if(q==="Q1" && k==="G7"){
+    o[k]=pick(["Sì","No"],[50,50]);
+    return;
+  }
+
+  if(q==="Q1" && k==="G8"){
+    o[k]=pick(["Sì","Qualche volta","No"],[30,30,40]);
+    return;
+  }
+
+  o[k]=d.m?multi(d.o,d.w,d.max||2):pick(d.o,d.w);
+});
     if(q==="Q2"){ASPETTI_I.forEach((a,j)=>{o["I6a|"+a]=String(Math.max(1,Math.min(10,Math.round(6.5+R()*3.2))));o["I6b|"+a]=String(Math.max(1,Math.min(10,Math.round(5.2+R()*3.4+(j===0?-1.3:0)+(j===8?-1:0)+(j===3?.9:0)))))});
       o.I7a=String(Math.max(1,Math.min(10,Math.round(5.5+R()*4))));o.I7b=String(Math.max(0,Math.min(10,Math.round(4+R()*6.2))))}
     if(q==="Q3"){ASPETTI_M.forEach((a,j)=>{o["M7a|"+a]=String(Math.max(1,Math.min(10,Math.round(5.8+R()*3.4+(j===2?.7:0)))));
