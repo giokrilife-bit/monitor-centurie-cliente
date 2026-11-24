@@ -1,0 +1,554 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Monitor Centurie 2026</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&display=swap">
+<style>
+/* Layout: barra di filtri fissa in alto, schede per area (panoramica, profili, confronto 2017, galleria, iper, mercati), barre orizzontali con valori scritti. */
+:root{
+  --bg:#f4f5f6; --card:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#7a7974; --line:#e1e2e0;
+  --s1:#2a78d6; --s2:#eb6834; --base:#8a93a0; --good:#1a7f4b; --bad:#c23b3b;
+  --font:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif; --head:'Space Grotesk','Inter',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121313; --card:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#9a998f; --line:#2c2d2b;
+  --s1:#3987e5; --s2:#d95926; --base:#7b8492; --good:#3fb97a; --bad:#e66767; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121313; --card:#1a1a19; --ink:#f0efec; --ink2:#c3c2b7; --muted:#9a998f; --line:#2c2d2b;
+  --s1:#3987e5; --s2:#d95926; --base:#7b8492; --good:#3fb97a; --bad:#e66767; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.45;
+  padding-block:0 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--card)}
+.wrap{max-width:1180px;margin:0 auto}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between;padding:20px 0 12px}
+h1{font:600 22px/1.1 var(--head);margin:0;letter-spacing:-.01em}
+.sub{color:var(--ink2);margin:4px 0 0}
+.src{font-size:12px;padding:3px 9px;border:1px solid var(--line);border-radius:99px;color:var(--ink2);background:var(--card)}
+.src.demo{border-color:var(--s2);color:var(--s2)}
+.tools{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);padding:8px 0;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px}
+select,button,input[type=text]{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 10px;min-height:34px}
+select{max-width:100%}
+button{cursor:pointer}
+button:hover,select:hover{border-color:var(--muted)}
+button.primary{background:var(--s1);border-color:var(--s1);color:#fff}
+:focus-visible{outline:2px solid var(--s1);outline-offset:2px}
+.spacer{flex:1}
+nav{display:flex;gap:4px;overflow-x:auto;padding:12px 0 0;border-bottom:1px solid var(--line)}
+nav button{border:0;border-bottom:2px solid transparent;border-radius:0;background:none;padding:8px 12px;white-space:nowrap;color:var(--ink2)}
+nav button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--s1);font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:16px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+.kpi b{display:block;font:600 28px/1.1 var(--head);font-variant-numeric:tabular-nums}
+.kpi span{color:var(--ink2);font-size:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px;margin-top:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 16px;min-width:0}
+.card h3{font:600 14px/1.3 var(--head);margin:0 0 2px}
+.card .n{color:var(--muted);font-size:12px;margin:0 0 10px}
+.br{display:grid;grid-template-columns:minmax(90px,38%) 1fr 44px;gap:8px;align-items:center;padding:3px 0}
+.bl{color:var(--ink2);font-size:12.5px;min-width:0;overflow-wrap:anywhere}
+.bt{height:10px;background:var(--line);border-radius:2px;position:relative}
+.bt i{position:absolute;left:0;top:0;bottom:0;background:var(--s1);border-radius:0 4px 4px 0;min-width:2px}
+.bt i.b2{background:var(--base)} .bt i.o{background:var(--s2)}
+.bv{text-align:right;font-variant-numeric:tabular-nums;font-size:12.5px}
+.br:hover,.br:focus-visible{background:color-mix(in srgb,var(--s1) 8%,transparent)}
+.br.click{cursor:pointer;border-radius:4px}
+.br.dim .bt i{opacity:.35} .br.dim .bl,.br.dim .bv{opacity:.6}
+.br.on .bl,.br.on .bv{color:var(--ink);font-weight:600}
+td.click{cursor:pointer} td.cellon{outline:2px solid var(--s1);outline-offset:-2px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:10px 0 0}.chips:empty{display:none}
+.chip{display:inline-flex;gap:6px;align-items:center;background:color-mix(in srgb,var(--s1) 14%,var(--card));border:1px solid var(--s1);border-radius:99px;padding:3px 6px 3px 10px;font-size:12.5px;min-height:0}
+.chip b{font-weight:600}
+.cmp .br{grid-template-columns:minmax(120px,32%) 1fr 70px}
+.cmp .pair{display:grid;gap:3px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink2);margin:4px 0 8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.delta.up{color:var(--good)} .delta.down{color:var(--bad)}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:12.5px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--ink2);font-weight:500}
+.scroll{overflow-x:auto}
+.note{color:var(--muted);font-size:12px;margin:10px 0 0}
+.empty{color:var(--muted);padding:24px;text-align:center}
+.warn{color:var(--s2)}
+#tip{position:fixed;z-index:40;pointer-events:none;background:var(--ink);color:var(--bg);padding:5px 9px;border-radius:5px;font-size:12px;max-width:260px;display:none}
+dialog{background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;max-width:520px;width:calc(100% - 32px)}
+dialog::backdrop{background:#0008}
+dialog label{display:block;margin:12px 0 4px;font-weight:500}
+dialog input[type=text]{width:100%}
+body.pres{font-size:17px}
+body.pres .tools .hide-pres,body.pres header .src{display:none}
+body.pres .card h3{font-size:17px} body.pres .bl,body.pres .bv{font-size:15px}
+body.pres .kpi b{font-size:38px}
+.pbar{display:none;color:var(--ink2);padding:8px 0}
+body.pres .pbar{display:block}
+@media (prefers-reduced-motion:no-preference){.bt i{transition:width .25s}}
+
+html{color-scheme:light dark}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+[hidden]{display:none!important}
+img{max-width:100%}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Monitor Centurie 2026</h1>
+      <p class="sub">Indagine al cliente: Galleria, ipermercato e mercati del territorio, con confronto sul 2017</p>
+    </div>
+    <span id="src" class="src demo">Dati dimostrativi</span>
+  </header>
+
+  <div class="tools" role="toolbar" aria-label="Filtri">
+    <select id="f-q" aria-label="Questionario" class="hide-pres"></select>
+    <select id="f-A2" aria-label="Fascia d'età" class="hide-pres"></select>
+    <select id="f-seg" aria-label="Frequenza" class="hide-pres"></select>
+    <select id="f-C5" aria-label="Profilo di stile" class="hide-pres"></select>
+    <select id="f-C6" aria-label="Propensione alla spesa" class="hide-pres"></select>
+    <select id="f-A4" aria-label="Comune" class="hide-pres"></select>
+    <button id="reset" class="hide-pres">Azzera filtri</button>
+    <span class="spacer"></span>
+    <button id="load" class="hide-pres">Carica dati</button>
+    <button id="pres" class="primary">Presentazione</button>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="pbar" id="pbar"></div>
+
+  <nav id="tabs" role="tablist"></nav>
+  <main id="view"></main>
+  <p class="note">Clicca una barra, un segmento o una cella dei profili per filtrare tutti i grafici. Clicca di nuovo per toglierla. Ogni grafico mostra la propria distribuzione senza il proprio filtro, così puoi confrontare le alternative.</p>
+  <p class="note" id="foot"></p>
+</div>
+
+<dialog id="dlg">
+  <form method="dialog" id="dlgform">
+    <h3 style="margin:0 0 4px;font-family:var(--head)">Carica i dati reali</h3>
+    <p class="note" style="margin:0">Seleziona i CSV dei questionari scaricati da Google Fogli. Puoi caricare un solo questionario per il test oppure più CSV insieme. I file vengono letti dal browser e non vengono caricati su GitHub.</p>
+    <label for="files">File CSV</label>
+    <input type="file" id="files" accept=".csv,text/csv" multiple>
+    <label for="url">Oppure collega il foglio (link di condivisione, accesso «chiunque abbia il link»)</label>
+    <input type="text" id="url" placeholder="https://docs.google.com/spreadsheets/d/...">
+    <p class="note" id="dlgmsg"></p>
+    <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+      <button type="button" id="demo">Torna ai dati demo</button>
+      <button type="button" id="close">Chiudi</button>
+      <button type="button" id="go" class="primary">Collega</button>
+    </div>
+  </form>
+</dialog>
+<div id="tip"></div>
+
+<script>
+"use strict";
+/* ============ Definizione domande ============ */
+// t titolo, m multipla, o opzioni, w pesi dimostrativi (Q1/Q2), w3 pesi per i mercati
+const D = {
+  A1:{t:"Genere",o:["Donna","Uomo","Altro / preferisco non rispondere"],w:[66,33,1]},
+  A2:{t:"Fascia d'età",o:["Fino a 18 anni","19-24 anni","25-34 anni","35-44 anni","45-54 anni","55-64 anni","Oltre 65 anni"],w:[3,8,16,22,24,18,9],w3:[1,3,8,16,22,28,22]},
+  A3:{t:"Professione",o:["Impiegato / insegnante / funzionario","Operaio","Casalinga / casalingo","Pensionato","Imprenditore / dirigente / libero professionista","Artigiano / commerciante / lavoratore in proprio","Studente","In cerca di lavoro / disoccupato"],w:[30,12,12,14,8,10,9,5],w3:[14,12,16,32,5,12,3,6]},
+  C1:{t:"Frequenza di visita",o:["Ogni giorno","Più volte a settimana","Più volte al mese","Ogni tanto / raramente","Non ci vado mai"],w:[7,38,32,23,0],w3:[3,10,15,32,40]},
+  C2:{t:"Indicatore non utilizzato",o:[],w:[]},
+ C3:{t:"Tempo necessario per raggiungere Le Centurie",o:["Fino a 5 minuti","10 minuti","15 minuti","20 minuti","30 minuti","Oltre 30 minuti"],w:[16,32,28,12,8,4],w3:[4,12,18,26,24,16]},
+ C4:{t:"Motivo principale della visita",m:1,max:2,o:["Spesa all'ipermercato","Acquisti nei negozi della Galleria","Bar e ristorazione","Passare il tempo / guardare le vetrine","Sbrigare commissioni / ritirare un ordine online","Lavoro","Non frequento Le Centurie"],w:[40,36,18,16,7,3,0],w3:[14,16,8,6,2,1,45]},
+ C5:{t:"Profilo di acquisto (abbigliamento, calzature e accessori)",o:["Pratico / essenziale","Tradizionalista","Segue la moda (fashion victim)","Trendy / innovativo"],w:[50,30,14,6]},
+  C6:{t:"Propensione alla spesa",o:["Spendo poco / compro poco","Spendo poco / compro tanto","Spendo tanto / compro poco","Spendo tanto / compro tanto"],w:[40,32,18,10]},
+  C7:{t:"Canali di informazione su novità, promozioni ed eventi",m:1,max:2,o:["Social network","Sito web / app del centro","Radio locale","Volantini cartacei","Quotidiani locali","Newsletter / messaggi diretti","Passaparola","Me ne accorgo solo quando sono nel centro","Non mi informo"],w:[26,10,14,18,12,6,16,22,8],w3:[30,6,10,20,12,4,22,6,10]},
+  C8:{t:"Segue i canali social del Centro",m:1,o:["Facebook","Instagram","TikTok","Non seguo"],w:[30,34,10,48],w3:[20,22,8,62]},
+  A4:{t:"Comune",o:["San Giorgio delle Pertiche","Campodarsego","Camposampiero","Borgoricco","Santa Giustina in Colle","Loreggia","Massanzago","Cadoneghe","Curtarolo","Resana","Villa del Conte","Villanova di Camposampiero","Piombino Dese","Noale","Santa Maria di Sala","Vigodarzere","Limena","San Giorgio in Bosco","Campo San Martino"],w:[22,10,9,8,8,7,4,4,3,3,5,4,2,2,2,3,1,2,1],w3:[6,10,9,6,5,6,6,8,6,6,5,4,5,6,5,5,4,2,2]},
+  G1:{t:"Mezzo di trasporto",o:["Auto (benzina / diesel / ibrida)","Auto elettrica","Bici / moto / monopattino","A piedi","Mezzi pubblici (bus / treno)"],w:[91,3,3,2,1]},
+  G2:{t:"Tempo di permanenza",o:["Meno di 30 minuti","Tra 30 minuti e 1 ora","Tra 1 e 2 ore","Oltre 2 ore"],w:[22,38,30,10]},
+  G3:{t:"Spesa indicativa nel Centro",o:["Meno di 15 €","15-30 €","31-50 €","51-100 €","Oltre 100 €"],w:[18,26,26,20,10]},
+  G4:{t:"Negozio o servizio da aggiungere",m:1,o:["Libreria / giornali / edicola","Abbigliamento e moda giovane","Abbigliamento classico / taglie forti / donna-signora","Articoli sportivi / abbigliamento tecnico","Giocattoli / articoli per bambini","Elettronica / videogiochi / telefonia","Ristorazione veloce di tendenza","Servizi di supporto (sportello bancomat, lavanderia)","Altro"],w:[32,14,10,16,14,9,12,14,8]},
+  G5:{t:"Aggettivi del Centro",m:1,o:["Comodo / vicino","Confortevole / accogliente","Familiare","Completo (trovo tutto ciò che serve)","Superato / poco attrattivo"],w:[55,20,26,14,12]},
+  G6:{t:"Punti di debolezza",m:1,o:["Poca varietà di negozi / mancanza di grandi brand","Gestione dei parcheggi","Offerta di ristorazione limitata","Mancanza di servizi utili","Nessun punto debole"],w:[40,26,14,18,18]},
+  G7:{t:"Visita il Centro anche solo per mangiare, fare un aperitivo o prendere un caffè",o:["Sì","No"],w:[50,50]},
+G8:{t:"Utilizzo del Centro per acquisti online, ritiro pacchi e Click & Collect",o:["Sì","Qualche volta","No"],w:[30,30,40]},
+  G9:{t:"Acquisti online ritirati al Centro",o:["Sì, spesso","Sì, qualche volta","No, mai, ma lo troverei utile","No, non mi interessa"],w:[6,16,28,50]},
+  G10:{t:"Importanza dei servizi per la sostenibilità",o:["Molto importanti","Abbastanza importanti","Poco o per nulla importanti"],w:[14,40,46]},
+  G11:{t:"Servizi extra che farebbero venire di più",m:1,o:["Coworking / smart working","Servizi medici","Pet care / area cani","Area fitness / palestra","Baby parking / ludoteca custodita","Nessuno"],w:[6,22,12,18,16,36]},
+  G12:{t:"Premio preferito nei concorsi",o:["Buoni acquisto da spendere nel Centro","Premi fisici (prodotti, oggettistica)","Esperienze (cene, weekend, eventi)"],w:[62,24,14]},
+  G9b:{t:"Uso dello smartphone durante la visita",m:1,o:["Consulto sito / social del Centro (orari, promozioni, mappa)","Cerco recensioni o confronto i prezzi online prima di comprare in negozio","Uso lo smartphone solo per scopi personali","Non lo uso durante la visita"],w:[20,30,50,20]},
+  G13:{t:"Gift Card del Centro",o:["Sì","No","Forse / dipende dall'uso"],w:[28,45,27]},
+  I1:{t:"Frequenza di spesa all'iper",o:["Più volte a settimana","Una volta a settimana","Ogni 2 settimane","Una volta al mese","Raramente"],w:[22,44,20,9,5]},
+  I2:{t:"Quota della spesa alimentare fatta qui",o:["Meno del 25%","25-50%","50-75%","Più del 75%"],w:[18,34,30,18]},
+  I3:{t:"Dove fa il resto della spesa",m:1,o:["Discount","Supermercati di prossimità","Altri ipermercati / grandi superfici","Mercato / produttori locali","Spesa online / drive / consegna a domicilio","Nessun altro punto"],w:[40,36,28,22,8,10]},
+  I5:{t:"Solo iper o anche Galleria",o:["Solo ipermercato","Prima l'ipermercato, poi la Galleria","Prima la Galleria, poi l'ipermercato","Solo Galleria (intervista all'esterno dell'iper)"],w:[44,34,14,8]},
+  I11:{t:"Spesa online o drive",o:["Sì, regolarmente","Sì, qualche volta","No, ma lo userei","No, non mi interessa"],w:[5,15,25,55]},
+  I14:{t:"Se l'iper chiudesse, resterebbe in Galleria",o:["Sì, come ora","Sì, ma meno spesso","No"],w:[22,48,30]},
+  M1:{t:"Cosa acquista al mercato",m:1,o:["Ortofrutta","Alimentari / gastronomia","Abbigliamento","Calzature","Casa / tessile","Altro"],w:[60,40,40,20,22,8]},
+  M2:{t:"Dove fa acquisti non alimentari",m:1,o:["Centri commerciali","Negozi del centro città","Outlet","Negozi di quartiere / di paese","Online","Mercato"],w:[56,40,22,28,36,24]},
+  M3:{t:"Centri commerciali frequentati",m:1,o:["Ipercity","Emisfero","Le Brentelle","I Giardini del Sole","Altro (specificare)","Nessuno"],w:[34,24,30,14,12,10]},
+  M5:{t:"Perché non frequenta Le Centurie",m:1,max:2,o:["Non lo conosco","È lontano / difficile da raggiungere","Non trovo i negozi che mi interessano","Prezzi","Parcheggio","Preferisco altri centri","Preferisco acquistare online","Non mi piacciono i centri commerciali in generale"],w:[8,14,26,10,4,22,12,8]},
+  M6:{t:"Cosa farebbe cambiare abitudini",m:1,max:2,o:["Più negozi di marca","Prezzi più bassi / più promozioni","Più ristorazione","Eventi e intrattenimento","Servizi per famiglie e bambini","Parcheggio più comodo","Orari più estesi","Nulla, non mi interessano"],w:[34,30,14,12,16,8,8,18]},
+  M8:{t:"Acquisti online",o:["Mai","Ogni tanto","Spesso"],w:[22,48,30]}
+};
+const Q_BY={Q1:["G1","G2","G3","G4","G5","G6","G7","G8","G9b","G10","G11","G12","G13"],Q2:["I1","I2","I3","I5","I11","I14"],Q3:["M1","M2","M3","M5","M6","M8"]};
+const ASPETTI_I=["Prezzi","Promozioni e volantino","Ampiezza dell'assortimento","Qualità dei freschi (ortofrutta, macelleria, panetteria, pescheria)","Prodotti locali / del territorio","Prodotti bio / salutistici","Marche del distributore","Pulizia e ordine dei reparti","Tempi di attesa alle casse","Casse self-service","Cortesia e competenza del personale","Orari di apertura","Parcheggio e accessibilità"];
+const ASPETTI_M=["Varietà dei negozi","Marchi e insegne presenti","Convenienza dei prezzi","Offerta di ristorazione","Servizi (bancomat, aree relax, baby parking)","Parcheggio","Comodità di accesso","Ambiente e pulizia","Eventi e animazione"];
+const Q_NAME={Q1:"Galleria",Q2:"Ipermercato",Q3:"Mercati"};
+// Dati 2017 dal report (pagine indicate); da ricontrollare sulle tabelle originali
+const Y17=[
+  {k:"donne",l:"Donne tra gli intervistati",v:66.8,p:"p. 22"},
+  {k:"auto",l:"Arriva in auto",v:95.8,p:"p. 36"},
+  {k:"v15",l:"Entro 15 minuti da casa",v:78.2,p:"p. 35"},
+  {k:"freq",l:"Viene almeno una volta a settimana",v:47.1,p:"p. 44"},
+  {k:"acq",l:"Viene per acquistare",v:58.7,p:"p. 41"},
+];
+
+/* ============ Utilità ============ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const short=s=>String(s).split(" (")[0].split(":")[0];
+const pc=(n,d)=>d?Math.round(n/d*1000)/10:0;
+const nz=s=>String(s||"").toLowerCase().replace(/\s*\/\s*/g,"/").trim();
+const has=(d,v,o)=>d.m?nz(v).includes(nz(o)):(nz(v)===nz(o)||nz(v).startsWith(nz(o)));
+const fmt=x=>(Math.round(x*10)/10).toLocaleString("it-IT",{minimumFractionDigits:0,maximumFractionDigits:1});
+function parseCSV(t){const rows=[];let r=[],c="",q=false;
+  for(let i=0;i<t.length;i++){const ch=t[i];
+    if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}
+    else if(ch==='"')q=true; else if(ch===","){r.push(c);c=""}
+    else if(ch==="\n"||ch==="\r"){if(ch==="\r"&&t[i+1]==="\n")i++;r.push(c);c="";if(r.some(x=>x!==""))rows.push(r);r=[]}
+    else c+=ch}
+  if(c!==""||r.length){r.push(c);rows.push(r)}return rows}
+
+/* ============ Dati ============ */
+let DATA=[],MODE="demo";
+
+function ingest(csvRows,hint){
+  if(!csvRows || csvRows.length < 2) return [];
+
+  const parsed = csvRows[0].map(h => {
+    const clean = String(h || "").replace(/^\uFEFF/,"").trim();
+    const m = clean.match(/^([A-Z]\d+[a-z]?)(?:\.|\s|$)/);
+    const sub = clean.match(/\[(.+)\]\s*$/);
+    return m ? {
+      code: m[1],
+      aspect: sub ? sub[1].trim() : null
+    } : null;
+  });
+
+  const codes = parsed.filter(Boolean).map(x => x.code);
+  const q = hint ||
+    (codes.includes("G1") ? "Q1" :
+     codes.includes("I1") ? "Q2" :
+     codes.includes("M2b") ? "Q3" : null);
+
+  if(!q) return [];
+
+  const common = {
+    A1:"A1", A2:"A2", A3:"A3", A4:"A4",
+    C1:"C1", C2:"C3", C3:"C4",
+    C4:"C5", C5:"C6", C6:"C7"
+  };
+
+  const specific = {
+    Q1:{
+      G1:"G1", G2:"G2", G3:"G3", G4:"G4",
+      G5:"G5", G6:"G6", G7:"G7", G8:"G8",
+      G9:"G9b", G10:"G10", G11:"G11",
+      G12:"G12", G13:"G13"
+    },
+    Q2:{
+      I1:"I1", I2:"I2", I3:"I3", I5:"I5",
+      I6a:"I6a", I6b:"I6b",
+      I7a:"I7a", I7b:"I7b",
+      I11:"I11", I14:"I14"
+    },
+    Q3:{
+      M2b:"M1", M3:"M2", M4:"M3",
+      M6:"M5", M7:"M6",
+      M8a:"M7a", M8b:"M7b", M9a:"M8"
+    }
+  };
+
+  const out = [];
+
+  for(const row of csvRows.slice(1)){
+    if(!row.some(v => String(v || "").trim())) continue;
+
+    const o = {_q:q};
+
+    parsed.forEach((h,i) => {
+      if(!h) return;
+
+      const value = String(row[i] || "").trim();
+      if(!value) return;
+
+      if(q === "Q3" && h.code === "M4b"){
+        o._M4b = value;
+        return;
+      }
+
+      const target = common[h.code] ||
+        (specific[q] && specific[q][h.code]);
+
+      if(!target) return;
+
+      o[h.aspect ? target + "|" + h.aspect : target] = value;
+    });
+
+    if(q === "Q3" && o.M3 && o._M4b){
+      o.M3 = o.M3 + "; " + o._M4b;
+    }
+
+    out.push(o);
+  }
+
+  return out;
+}
+
+function hintFrom(name){const n=name.toLowerCase();return /q1|galleria/.test(n)?"Q1":/q2|iper/.test(n)?"Q2":/q3|mercat/.test(n)?"Q3":null}
+function seg(r){const c=r.C1||"";return /Ogni giorno|Più volte a settimana/.test(c)?"Abituali (almeno settimanale)":/Più volte al mese/.test(c)?"Regolari (mensile)":/Ogni tanto/.test(c)?"Occasionali":/Non ci vado/.test(c)?"Non frequentatori":""}
+
+/* dati dimostrativi: generati con numeri casuali ripetibili */
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function demo(){
+  const R=rng(2026);
+  const pick=(o,w)=>{const s=w.reduce((a,b)=>a+b,0);let x=R()*s;for(let i=0;i<o.length;i++){x-=w[i];if(x<=0)return o[i]}return o[o.length-1]};
+  const multi=(o,w,max)=>{const out=[];const n=1+(R()<.45?1:0);for(let k=0;k<(max||n);k++){if(max&&k>=n)break;const c=pick(o,w);if(!out.includes(c))out.push(c)}return out.join(", ")};
+  const common=["A1","A2","A3","A4","C1","C2","C3","C4","C5","C6","C7"];
+  const rows=[];
+  const mk=(q,n)=>{for(let i=0;i<n;i++){const o={_q:q};const m3=q==="Q3";
+    common.forEach(k=>{const d=D[k];const w=(m3&&d.w3)?d.w3:d.w;o[k]=d.m?multi(d.o,w,d.max||2):pick(d.o,w)});
+    if(m3&&!/Non frequento/.test(o.C3))o.C3=o.C3;
+    Q_BY[q].forEach(k=>{
+  const d=D[k];
+  if(common.includes(k))return;
+
+  if(q==="Q1" && k==="G7"){
+    o[k]=pick(["Sì","No"],[50,50]);
+    return;
+  }
+
+  if(q==="Q1" && k==="G8"){
+    o[k]=pick(["Sì","Qualche volta","No"],[30,30,40]);
+    return;
+  }
+
+  o[k]=d.m?multi(d.o,d.w,d.max||2):pick(d.o,d.w);
+});
+    if(q==="Q2"){ASPETTI_I.forEach((a,j)=>{o["I6a|"+a]=String(Math.max(1,Math.min(10,Math.round(6.5+R()*3.2))));o["I6b|"+a]=String(Math.max(1,Math.min(10,Math.round(5.2+R()*3.4+(j===0?-1.3:0)+(j===8?-1:0)+(j===3?.9:0)))))});
+      o.I7a=String(Math.max(1,Math.min(10,Math.round(5.5+R()*4))));o.I7b=String(Math.max(0,Math.min(10,Math.round(4+R()*6.2))))}
+    if(q==="Q3"){ASPETTI_M.forEach((a,j)=>{o["M7a|"+a]=String(Math.max(1,Math.min(10,Math.round(5.8+R()*3.4+(j===2?.7:0)))));
+      if(!/Non frequento/.test(o.C4)&&!/Non ci vado/.test(o.C1))o["M7b|"+a]=String(Math.max(1,Math.min(10,Math.round(5.5+R()*3.2+(j===2?-.4:0)+(j===3?-1.2:0)))))});}
+    rows.push(o)}};
+  mk("Q1",230);mk("Q2",150);mk("Q3",190);return rows}
+
+/* ============ Filtri ============ */
+const F={q:"",seg:""};
+const X={}; // codice domanda -> insieme di risposte scelte (menu e clic sui grafici)
+const XS=["A2","C5","C6","A4"];
+function okX(r,skip){for(const c in X){if(c===skip||!X[c].size)continue;const d=D[c];const v=r[c]||"";let hit=false;for(const o of X[c]){if(has(d,v,o)){hit=true;break}}if(!hit)return false}return true}
+function matches(r,skip){return(!F.q||r._q===F.q)&&(!F.seg||skip==="seg"||seg(r)===F.seg)&&okX(r,skip)}
+function fillSelect(id,label,vals,map){const s=$(id);const cur=s.value;s.innerHTML=`<option value="">${esc(label)}</option>`+vals.map(v=>`<option value="${esc(v)}">${esc(map?map(v):v)}</option>`).join("");s.value=vals.includes(cur)?cur:""}
+function buildFilters(){
+  fillSelect("#f-q","Tutti i questionari",["Q1","Q2","Q3"],v=>"Q"+v[1]+" "+Q_NAME[v]);
+  fillSelect("#f-A2","Tutte le età",D.A2.o);
+  fillSelect("#f-seg","Tutte le frequenze",["Abituali (almeno settimanale)","Regolari (mensile)","Occasionali","Non frequentatori"]);
+  fillSelect("#f-C5","Tutti gli stili",D.C5.o);
+  fillSelect("#f-C6","Tutte le propensioni",D.C6.o);
+  fillSelect("#f-A4","Tutti i comuni",[...new Set(DATA.map(r=>r.A4).filter(Boolean))].sort());
+}
+["q","seg"].forEach(k=>$("#f-"+k).addEventListener("change",e=>{F[k]=e.target.value;render()}));
+XS.forEach(c=>$("#f-"+c).addEventListener("change",e=>{const v=e.target.value;if(v)X[c]=new Set([v]);else delete X[c];render()}));
+$("#reset").onclick=()=>{F.q="";F.seg="";Object.keys(X).forEach(k=>delete X[k]);render()};
+
+/* ============ Calcoli ============ */
+function dist(code,rows){
+  const d=D[code];
+  const ans=rows.filter(r=>r[code]);
+  const n=ans.length;
+
+  const observed = ans.flatMap(r =>
+    String(r[code]).split(/[,;]\s*/)
+  ).filter(Boolean);
+
+  // G7 e G8: mostra soltanto le risposte effettivamente presenti nel CSV.
+  // Per le altre domande mantieni anche le opzioni previste con zero risposte.
+  const options = [...new Set(
+    code === "G7" || code === "G8"
+      ? observed
+      : [...(d.o || []), ...observed]
+  )].filter(Boolean);
+  
+
+  const items=options.map(o=>{
+    const c=ans.filter(r=>has(d,r[code],o)).length;
+    return{
+      l:short(o),
+      full:o,
+      n:c,
+      p:pc(c,n)
+    };
+  });
+
+  return{items,n};
+}
+function avgGrid(prefix,rows,asp){return asp.map(a=>{const v=rows.map(r=>parseFloat(r[prefix+"|"+a])).filter(x=>!isNaN(x));return{l:a,v:v.length?v.reduce((x,y)=>x+y,0)/v.length:null,n:v.length}})}
+
+/* ============ Disegno ============ */
+function bars(items,n,opt={}){
+  if(!n)return'<div class="empty">Nessuna risposta con i filtri scelti</div>';
+  const max=opt.scale100?100:Math.max(...items.map(i=>i.p),1);
+  const sel=opt.sel&&opt.sel.size?opt.sel:null;const hasSel=opt.seg?!!F.seg:!!sel;
+  return items.map(i=>{const on=opt.seg?F.seg===i.full:!!(sel&&sel.has(i.full));
+    const cl=(opt.code||opt.seg?" click":"")+(hasSel?(on?" on":" dim"):"");
+    const at=opt.code?` role="button" aria-pressed="${on}" data-code="${opt.code}" data-opt="${esc(i.full||i.l)}"`:opt.seg?` role="button" aria-pressed="${on}" data-seg="${esc(i.full)}"`:"";
+    return`<div class="br${cl}" tabindex="0"${at} data-tip="${esc(i.full||i.l)}: ${i.n} su ${n} (${fmt(i.p)}%)"><span class="bl">${esc(i.l)}</span><span class="bt"><i style="width:${i.p/max*100}%"></i></span><span class="bv">${fmt(i.p)}%</span></div>`}).join("")}
+const QOF=c=>c[0]==="G"?"Q1":c[0]==="I"?"Q2":c[0]==="M"?"Q3":"";
+function card(title,code,rows,opt){const pool=DATA.filter(r=>matches(r,code)&&(!QOF(code)||r._q===QOF(code)));const r=dist(code,pool);const sel=X[code]&&X[code].size?X[code]:null;return`<section class="card"><h3>${esc(title||D[code].t)}</h3><p class="n">${r.n} risposte${r.n&&r.n<30?' <span class="warn">· campione ridotto</span>':""}${D[code].m?" · più risposte possibili":""}</p>${bars(r.items,r.n,Object.assign({},opt,{code,sel}))}</section>`}
+function tile(v,l){return`<div class="kpi"><b>${v}</b><span>${esc(l)}</span></div>`}
+const sub=q=>DATA.filter(r=>r._q===q&&matches(r));
+
+/* ============ Sezioni ============ */
+const SECT=[
+ {id:"pan",l:"Panoramica",f(rows){
+   const d=rows.filter(r=>r.A1);const don=pc(d.filter(r=>r.A1==="Donna").length,d.length);
+   const ab=pc(rows.filter(r=>seg(r)==="Abituali (almeno settimanale)").length,rows.filter(r=>r.C1).length);
+   const v15=pc(rows.filter(r=>/Fino a 5|10 minuti|15 minuti/.test(r.C3||"")).length,rows.filter(r=>r.C3).length);
+   return`<div class="kpis">${tile(rows.length.toLocaleString("it-IT"),"interviste")}${tile(fmt(don)+"%","donne")}${tile(fmt(ab)+"%","vengono almeno una volta a settimana")}${tile(fmt(v15)+"%","abitano entro 15 minuti")}</div>
+   <div class="grid">${card("Fascia d'età","A2",rows)}${card("Frequenza di visita","C1",rows)}${card("Tempo necessario per raggiungere Le Centurie","C3",rows)}${card("Motivo principale della visita","C4",rows)}${card("Canali di informazione","C7",rows)}${card("Professione","A3",rows)}</div>`}},
+ {id:"pro",l:"Profili di consumatore",f(rows){
+   const a=D.C5.o,b=D.C6.o;const ok=rows.filter(r=>r.C5&&r.C6);
+   const mx=Math.max(1,...a.flatMap(x=>b.map(y=>ok.filter(r=>has(D.C5,r.C5,x)&&has(D.C6,r.C6,y)).length)));
+   const tb=`<div class="scroll"><table><thead><tr><th>Stile \\ Spesa</th>${b.map(y=>`<th>${esc(short(y))}</th>`).join("")}</tr></thead><tbody>${a.map(x=>`<tr><td>${esc(short(x))}</td>${b.map(y=>{const c=ok.filter(r=>has(D.C5,r.C5,x)&&has(D.C6,r.C6,y)).length;return`<td class="click${X.C5&&X.C5.has(x)&&X.C6&&X.C6.has(y)?" cellon":""}" data-c4="${esc(x)}" data-c5="${esc(y)}" style="background:color-mix(in srgb,var(--s1) ${Math.round(c/mx*45)}%,transparent)" data-tip="${esc(short(x))} + ${esc(short(y))}: ${c} intervistati">${c?fmt(pc(c,ok.length))+"%":"-"}</td>`}).join("")}</tr>`).join("")}</tbody></table></div>`;
+   const segs=["Abituali (almeno settimanale)","Regolari (mensile)","Occasionali","Non frequentatori"];
+   const segRows=DATA.filter(r=>matches(r,"seg"));const tot=segRows.filter(r=>seg(r)).length;
+   return`<div class="grid">${card("Profilo di stile","C5",rows)}${card("Propensione alla spesa","C6",rows)}
+   <section class="card" style="grid-column:1/-1"><h3>Stile e propensione alla spesa</h3><p class="n">${ok.length} intervistati, % sul totale</p>${tb}</section>
+   <section class="card" style="grid-column:1/-1"><h3>Segmenti per frequenza di visita</h3><p class="n">${tot} intervistati</p>${bars(segs.map(s=>{const c=segRows.filter(r=>seg(r)===s).length;return{l:s,full:s,n:c,p:pc(c,tot)}}),tot,{seg:1})}</section></div>`}},
+ {id:"c17",l:"Confronto 2017",f(rows){
+   const base=rows.filter(r=>r._q!=="Q3");const q1=base.filter(r=>r._q==="Q1");
+   const val={
+    donne:()=>{const d=base.filter(r=>r.A1);return[pc(d.filter(r=>r.A1==="Donna").length,d.length),d.length]},
+    auto:()=>{const d=q1.filter(r=>r.G1);return[pc(d.filter(r=>/^Auto/.test(r.G1)).length,d.length),d.length]},
+    v15:()=>{const d=base.filter(r=>r.C3);return[pc(d.filter(r=>/Fino a 5|10 minuti|15 minuti/.test(r.C3)).length,d.length),d.length]},
+    freq:()=>{const d=base.filter(r=>r.C1);return[pc(d.filter(r=>/Ogni giorno|Più volte a settimana/.test(r.C1)).length,d.length),d.length]},
+    acq:()=>{const d=base.filter(r=>r.C4);return[pc(d.filter(r=>/Acquisti nei negozi|Spesa all/.test(r.C4)).length,d.length),d.length]},
+    };
+   const lines=Y17.map(y=>{const[v,n]=val[y.k]();const dl=v-y.v;return`<div class="pair" style="padding:8px 0;border-bottom:1px solid var(--line)"><div class="bl" style="color:var(--ink)">${esc(y.l)} <span class="n" style="margin:0">(${y.p} del report 2017, 2026 su ${n} risposte)</span></div>
+     <div class="br" tabindex="0" data-tip="2017: ${fmt(y.v)}%"><span class="bl">2017</span><span class="bt"><i class="b2" style="width:${y.v}%"></i></span><span class="bv">${fmt(y.v)}%</span></div>
+     <div class="br" tabindex="0" data-tip="2026: ${fmt(v)}% su ${n}"><span class="bl">2026</span><span class="bt"><i style="width:${n?v:0}%"></i></span><span class="bv">${n?fmt(v)+"%":"-"}</span></div>
+     <div class="n" style="margin:0;text-align:right">${n?`<span class="delta ${dl>=0?"up":"down"}">${dl>=0?"+":""}${fmt(dl)} punti</span>`:""}</div></div>`}).join("");
+   return`<section class="card cmp"><h3>Prima e dopo: dal 2017 a oggi</h3><p class="n">Interviste in Centro (Questionari 1 e 2). L'auto si calcola sul solo Questionario 1.</p><div class="legend"><span><i style="background:var(--base)"></i>2017</span><span><i style="background:var(--s1)"></i>2026</span></div>${lines}
+   <p class="note">«Viene per acquistare» unisce la spesa all'iper e gli acquisti in Galleria: le risposte 2026 sono più dettagliate del 2017, quindi il confronto è indicativo. I dati 2017 vanno ricontrollati sul report originale.</p></section>`}},
+ {id:"gal",l:"Galleria",f(){const rows=sub("Q1");if(!rows.length)return'<div class="empty">Nessuna intervista del Questionario 1 con i filtri scelti</div>';
+   return`<div class="kpis">${tile(rows.length,"interviste in Galleria")}</div><div class="grid">${Q_BY.Q1.map(k=>card(D[k].t,k,rows)).join("")}</div>`}},
+ {id:"ipe",l:"Ipermercato",f(){const rows=sub("Q2");if(!rows.length)return'<div class="empty">Nessuna intervista del Questionario 2 con i filtri scelti</div>';
+   const sat=rows.map(r=>parseFloat(r.I7a)).filter(x=>!isNaN(x));const nps=rows.map(r=>parseFloat(r.I7b)).filter(x=>!isNaN(x));
+   const np=nps.length?Math.round((nps.filter(x=>x>=9).length-nps.filter(x=>x<=6).length)/nps.length*100):null;
+   const imp=avgGrid("I6a",rows,ASPETTI_I),sod=avgGrid("I6b",rows,ASPETTI_I);
+   const tab=ASPETTI_I.map((a,i)=>({a,i:imp[i].v,s:sod[i].v,g:(imp[i].v!=null&&sod[i].v!=null)?sod[i].v-imp[i].v:null})).sort((x,y)=>(x.g??9)-(y.g??9));
+   return`<div class="kpis">${tile(rows.length,"interviste")}${tile(sat.length?fmt(sat.reduce((a,b)=>a+b,0)/sat.length):"-","soddisfazione complessiva (1-10)")}${tile(np==null?"-":(np>0?"+":"")+np,"indice di raccomandazione (da -100 a +100)")}</div>
+   <section class="card"><h3>Importanza e soddisfazione</h3><p class="n">Media su 10. Ordinato dal divario peggiore (soddisfazione sotto l'importanza) al migliore.</p>
+   <div class="legend"><span><i style="background:var(--s1)"></i>Importanza</span><span><i style="background:var(--s2)"></i>Soddisfazione</span></div>
+   ${tab.map(t=>`<div class="pair" style="padding:6px 0;border-bottom:1px solid var(--line)"><div class="bl" style="color:var(--ink)">${esc(t.a)} <span class="delta ${t.g>=0?"up":"down"}">${t.g==null?"":(t.g>=0?"+":"")+fmt(t.g)}</span></div>
+   <div class="br" tabindex="0" data-tip="Importanza ${t.i==null?"-":fmt(t.i)}"><span class="bl">Importanza</span><span class="bt"><i style="width:${(t.i||0)*10}%"></i></span><span class="bv">${t.i==null?"-":fmt(t.i)}</span></div>
+   <div class="br" tabindex="0" data-tip="Soddisfazione ${t.s==null?"-":fmt(t.s)}"><span class="bl">Soddisfazione</span><span class="bt"><i class="o" style="width:${(t.s||0)*10}%"></i></span><span class="bv">${t.s==null?"-":fmt(t.s)}</span></div></div>`).join("")}</section>
+   <div class="grid">${Q_BY.Q2.map(k=>card(D[k].t,k,rows)).join("")}</div>`}},
+ {id:"mer",l:"Mercati e competitor",f(){const rows=sub("Q3");if(!rows.length)return'<div class="empty">Nessuna intervista del Questionario 3 con i filtri scelti</div>';
+   const a=avgGrid("M7a",rows,ASPETTI_M),b=avgGrid("M7b",rows,ASPETTI_M);
+   const conosce=rows.filter(r=>r.C1);const nc=pc(conosce.filter(r=>!/Non ci vado/.test(r.C1)).length,conosce.length);
+   const nonfreq=pc(rows.filter(r=>seg(r)==="Non frequentatori").length,rows.filter(r=>r.C1).length);
+   return`<div class="kpis">${tile(rows.length,"interviste nei mercati")}${tile(fmt(nc)+"%","va a Le Centurie almeno ogni tanto")}${tile(fmt(nonfreq)+"%","non ci va mai")}</div>
+   <section class="card"><h3>Come valutano i centri: Le Centurie e il centro più frequentato</h3><p class="n">Media su 10</p><div class="legend"><span><i style="background:var(--base)"></i>Centro più frequentato</span><span><i style="background:var(--s1)"></i>Le Centurie</span></div>
+   ${ASPETTI_M.map((x,i)=>`<div class="pair" style="padding:6px 0;border-bottom:1px solid var(--line)"><div class="bl" style="color:var(--ink)">${esc(x)}</div>
+   <div class="br" tabindex="0" data-tip="Centro più frequentato: ${a[i].v==null?"-":fmt(a[i].v)} (${a[i].n} voti)"><span class="bl">Altro centro</span><span class="bt"><i class="b2" style="width:${(a[i].v||0)*10}%"></i></span><span class="bv">${a[i].v==null?"-":fmt(a[i].v)}</span></div>
+   <div class="br" tabindex="0" data-tip="Le Centurie: ${b[i].v==null?"-":fmt(b[i].v)} (${b[i].n} voti)"><span class="bl">Le Centurie</span><span class="bt"><i style="width:${(b[i].v||0)*10}%"></i></span><span class="bv">${b[i].v==null?"-":fmt(b[i].v)}</span></div></div>`).join("")}</section>
+   <div class="grid">${Q_BY.Q3.map(k=>card(D[k].t,k,rows)).join("")}</div>`}}
+];
+let cur=0;
+function renderTabs(){$("#tabs").innerHTML=SECT.map((s,i)=>`<button role="tab" aria-selected="${i===cur}" data-i="${i}">${esc(s.l)}</button>`).join("")}
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(b){cur=+b.dataset.i;render()}});
+function render(){
+  const rows=DATA.filter(matches);
+  renderTabs();
+  $("#view").innerHTML=SECT[cur].f(rows);
+  const ch=[];
+  if(F.q)ch.push({k:"q",t:"Questionario",v:"Q"+F.q[1]+" "+Q_NAME[F.q]});
+  if(F.seg)ch.push({k:"seg",t:"Frequenza",v:F.seg});
+  Object.keys(X).forEach(c=>X[c].forEach(o=>ch.push({k:"x",c,o,t:D[c].t,v:short(o)})));
+  $("#chips").innerHTML=ch.map((x,i)=>`<span class="chip">${esc(x.t)}: <b>${esc(x.v)}</b><button type="button" data-rm="${i}" aria-label="Togli filtro ${esc(x.v)}" style="border:0;background:none;padding:0 4px;min-height:0;color:inherit">×</button></span>`).join("");
+  $("#chips").onclick=e=>{const b=e.target.closest("[data-rm]");if(!b)return;const x=ch[+b.dataset.rm];if(x.k==="q")F.q="";else if(x.k==="seg")F.seg="";else{X[x.c].delete(x.o);if(!X[x.c].size)delete X[x.c]}render()};
+  ["q","seg"].forEach(k=>{$("#f-"+k).value=F[k]});
+  XS.forEach(c=>{$("#f-"+c).value=X[c]&&X[c].size===1?[...X[c]][0]:""});
+  $("#pbar").textContent=ch.length?"Filtri attivi: "+ch.map(x=>x.t+": "+x.v).join(" · "):"Tutte le interviste";
+  $("#foot").textContent=MODE==="demo"?"I numeri mostrati sono dati dimostrativi generati a caso, non risultati dell'indagine.":"Interviste caricate: "+DATA.length+". Percentuali calcolate su chi ha risposto alla singola domanda.";
+  const s=$("#src");s.textContent=MODE==="demo"?"Dati dimostrativi":"Dati reali: "+DATA.length+" interviste";s.className="src"+(MODE==="demo"?" demo":"");
+}
+
+/* ============ Tooltip ============ */
+const tip=$("#tip");
+document.addEventListener("pointermove",e=>{const t=e.target.closest&&e.target.closest("[data-tip]");if(!t){tip.style.display="none";return}
+  tip.textContent=t.dataset.tip;tip.style.display="block";const w=tip.offsetWidth;tip.style.left=Math.min(e.clientX+12,innerWidth-w-8)+"px";tip.style.top=(e.clientY+14)+"px"});
+document.addEventListener("focusin",e=>{const t=e.target.closest&&e.target.closest("[data-tip]");if(t){const r=t.getBoundingClientRect();tip.textContent=t.dataset.tip;tip.style.display="block";tip.style.left=r.left+"px";tip.style.top=(r.bottom+4)+"px"}});
+document.addEventListener("focusout",()=>{tip.style.display="none"});
+
+/* ============ Carica dati / presentazione ============ */
+const dlg=$("#dlg");
+$("#load").onclick=()=>{$("#dlgmsg").textContent="";dlg.showModal()};
+$("#close").onclick=()=>dlg.close();
+function setData(rows,mode){DATA=rows;MODE=mode;F.q="";F.seg="";Object.keys(X).forEach(k=>delete X[k]);buildFilters();render()}
+$("#demo").onclick=()=>{setData(demo(),"demo");dlg.close()};
+$("#files").addEventListener("change",async e=>{
+  const all=[];
+  const skipped=[];
+  const selected=[...e.target.files];
+
+  for(const f of selected){
+    try{
+      const t=await f.text();
+      const q=hintFrom(f.name);
+      const r=ingest(parseCSV(t),q);
+      if(r && r.length) all.push(...r);
+      else skipped.push(f.name);
+    }catch(err){
+      skipped.push(f.name);
+    }
+  }
+
+  if(all.length){
+    setData(all,"real");
+    dlg.close();
+  }
+
+  $("#dlgmsg").textContent=skipped.length
+    ? "File non riconosciuti o senza risposte: "+skipped.join(", ")+". Controlla che il nome identifichi Q1, Q2 o Q3."
+    : "";
+
+  // Consente di selezionare di nuovo lo stesso file per ripetere il test.
+  e.target.value="";
+});
+$("#go").onclick=async()=>{
+  const m=$("#url").value.match(/\/d\/([\w-]+)/);if(!m){$("#dlgmsg").textContent="Link non valido.";return}
+  $("#dlgmsg").textContent="Collegamento in corso...";
+  try{const all=[];for(const [n,q] of [["Q1_Galleria","Q1"],["Q2_Iper","Q2"],["Q3_Mercati","Q3"]]){
+      const res=await fetch(`https://docs.google.com/spreadsheets/d/${m[1]}/gviz/tq?tqx=out:csv&sheet=${n}`);if(!res.ok)throw new Error(res.status);
+      const r=ingest(parseCSV(await res.text()),q);if(r)all.push(...r)}
+    if(!all.length)throw new Error("vuoto");setData(all,"real");dlg.close()}
+  catch(err){$("#dlgmsg").textContent="Collegamento diretto non riuscito (il browser o la pagina lo blocca, oppure il foglio non è condiviso). Carica i file CSV con il pulsante qui sopra."}};
+$("#pres").onclick=()=>{document.body.classList.toggle("pres");$("#pres").textContent=document.body.classList.contains("pres")?"Esci":"Presentazione"};
+document.addEventListener("keydown",e=>{if(!document.body.classList.contains("pres"))return;
+  if(e.key==="ArrowRight"){cur=Math.min(SECT.length-1,cur+1);render()}else if(e.key==="ArrowLeft"){cur=Math.max(0,cur-1);render()}
+  else if(e.key==="Escape"){$("#pres").click()}});
+
+/* clic sui grafici: filtro incrociato su tutta la pagina */
+$("#view").addEventListener("click",e=>{
+  const b=e.target.closest("[data-code],[data-seg],[data-c4]");if(!b)return;
+  if(b.dataset.code){const c=b.dataset.code,o=b.dataset.opt;const s=X[c]||(X[c]=new Set());if(s.has(o))s.delete(o);else s.add(o);if(!s.size)delete X[c]}
+  else if(b.dataset.seg){F.seg=F.seg===b.dataset.seg?"":b.dataset.seg}
+  else{const a=b.dataset.c4,c=b.dataset.c5;const same=X.C5&&X.C5.size===1&&X.C5.has(a)&&X.C6&&X.C6.size===1&&X.C6.has(c);
+    if(same){delete X.C5;delete X.C6}else{X.C5=new Set([a]);X.C6=new Set([c])}}
+  render()});
+$("#view").addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-code],[data-seg]")){e.preventDefault();e.target.click()}});
+
+setData(demo(),"demo");
+</script>
+</body>
+</html>
