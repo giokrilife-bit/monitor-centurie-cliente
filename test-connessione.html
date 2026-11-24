@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Test connessione Monitor Centurie</title>
+</head>
+<body>
+
+<h2>Monitor Centurie 2026</h2>
+<h3>Test connessione GitHub - Google</h3>
+
+<button onclick="verifica()">Verifica connessione</button>
+
+<pre id="risultato">In attesa del test...</pre>
+
+<script>
+const URL_GOOGLE =
+"https://script.google.com/macros/s/AKfycbxf2DQaRqDEQJNcw3idyPF6u3GZ2jaidKUga48fBQYZ3MzRSZcBifoUclIJEQRHyKLy/exec";
+
+async function verifica() {
+  const risultato = document.getElementById("risultato");
+
+  risultato.textContent = "Connessione in corso...";
+
+  try {
+    const inizio = performance.now();
+
+    const risposta = await fetch(URL_GOOGLE, {
+      cache: "no-store"
+    });
+
+    if (!risposta.ok) {
+      throw new Error("HTTP " + risposta.status);
+    }
+
+    const dati = await risposta.json();
+    const durata = performance.now() - inizio;
+
+    if (dati.stato !== "OK") {
+      throw new Error("Risposta non valida");
+    }
+
+    risultato.textContent =
+      "CONNESSIONE RIUSCITA\n\n" +
+      JSON.stringify(dati, null, 2) +
+      "\n\nTempo di risposta: " +
+      (durata / 1000).toFixed(2) + " secondi";
+
+  } catch (errore) {
+    risultato.textContent =
+      "ERRORE DI CONNESSIONE\n\n" +
+      errore.message;
+  }
+}
+</script>
+
+</body>
+</html>
