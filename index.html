@@ -129,7 +129,7 @@ img{max-width:100%}
 <dialog id="dlg">
   <form method="dialog" id="dlgform">
     <h3 style="margin:0 0 4px;font-family:var(--head)">Carica i dati reali</h3>
-    <p class="note" style="margin:0">Dal foglio Google scarica i tre fogli di risposta in CSV (File &gt; Scarica &gt; CSV, un foglio alla volta: Q1_Galleria, Q2_Iper, Q3_Mercati) e caricali qui insieme.</p>
+    <p class="note" style="margin:0">Seleziona i CSV dei questionari scaricati da Google Fogli. Puoi caricare un solo questionario per il test oppure più CSV insieme. I file vengono letti dal browser e non vengono caricati su GitHub.</p>
     <label for="files">File CSV</label>
     <input type="file" id="files" accept=".csv,text/csv" multiple>
     <label for="url">Oppure collega il foglio (link di condivisione, accesso «chiunque abbia il link»)</label>
@@ -199,7 +199,6 @@ const Y17=[
   {k:"v15",l:"Entro 15 minuti da casa",v:78.2,p:"p. 35"},
   {k:"freq",l:"Viene almeno una volta a settimana",v:47.1,p:"p. 44"},
   {k:"acq",l:"Viene per acquistare",v:58.7,p:"p. 41"},
-  {k:"soc",l:"Segue almeno un canale social del Centro",v:17.9,p:"p. 33"}
 ];
 
 /* ============ Utilità ============ */
@@ -366,12 +365,17 @@ function dist(code,rows){
   const ans=rows.filter(r=>r[code]);
   const n=ans.length;
 
-  const options = [...new Set([
-    ...(d.o || []),
-    ...ans.flatMap(r =>
-      String(r[code]).split(/[,;]\s*/)
-    )
-  ])].filter(Boolean);
+  const observed = ans.flatMap(r =>
+    String(r[code]).split(/[,;]\s*/)
+  ).filter(Boolean);
+
+  // G7 e G8: mostra soltanto le risposte effettivamente presenti nel CSV.
+  // Per le altre domande mantieni anche le opzioni previste con zero risposte.
+  const options = [...new Set(
+    code === "G7" || code === "G8"
+      ? observed
+      : [...(d.o || []), ...observed]
+  )].filter(Boolean);
   
 
   const items=options.map(o=>{
@@ -409,7 +413,7 @@ const SECT=[
    const ab=pc(rows.filter(r=>seg(r)==="Abituali (almeno settimanale)").length,rows.filter(r=>r.C1).length);
    const v15=pc(rows.filter(r=>/Fino a 5|10 minuti|15 minuti/.test(r.C3||"")).length,rows.filter(r=>r.C3).length);
    return`<div class="kpis">${tile(rows.length.toLocaleString("it-IT"),"interviste")}${tile(fmt(don)+"%","donne")}${tile(fmt(ab)+"%","vengono almeno una volta a settimana")}${tile(fmt(v15)+"%","abitano entro 15 minuti")}</div>
-   <div class="grid">${card("Fascia d'età","A2",rows)}${card("Frequenza di visita","C1",rows)}${card("Giorni di frequentazione","C2",rows)}${card("Tempo da casa","C3",rows)}${card("Motivo principale di frequentazione","C4",rows)}${card("Come si informa","C7",rows)}${card("Canali social seguiti","C8",rows)}${card("Professione","A3",rows)}</div>`}},
+   <div class="grid">${card("Fascia d'età","A2",rows)}${card("Frequenza di visita","C1",rows)}${card("Tempo necessario per raggiungere Le Centurie","C3",rows)}${card("Motivo principale della visita","C4",rows)}${card("Canali di informazione","C7",rows)}${card("Professione","A3",rows)}</div>`}},
  {id:"pro",l:"Profili di consumatore",f(rows){
    const a=D.C5.o,b=D.C6.o;const ok=rows.filter(r=>r.C5&&r.C6);
    const mx=Math.max(1,...a.flatMap(x=>b.map(y=>ok.filter(r=>has(D.C5,r.C5,x)&&has(D.C6,r.C6,y)).length)));
@@ -427,7 +431,7 @@ const SECT=[
     v15:()=>{const d=base.filter(r=>r.C3);return[pc(d.filter(r=>/Fino a 5|10 minuti|15 minuti/.test(r.C3)).length,d.length),d.length]},
     freq:()=>{const d=base.filter(r=>r.C1);return[pc(d.filter(r=>/Ogni giorno|Più volte a settimana/.test(r.C1)).length,d.length),d.length]},
     acq:()=>{const d=base.filter(r=>r.C4);return[pc(d.filter(r=>/Acquisti nei negozi|Spesa all/.test(r.C4)).length,d.length),d.length]},
-    soc:()=>{const d=base.filter(r=>r.C8);return[pc(d.filter(r=>!/Non seguo/.test(r.C8)).length,d.length),d.length]}};
+    };
    const lines=Y17.map(y=>{const[v,n]=val[y.k]();const dl=v-y.v;return`<div class="pair" style="padding:8px 0;border-bottom:1px solid var(--line)"><div class="bl" style="color:var(--ink)">${esc(y.l)} <span class="n" style="margin:0">(${y.p} del report 2017, 2026 su ${n} risposte)</span></div>
      <div class="br" tabindex="0" data-tip="2017: ${fmt(y.v)}%"><span class="bl">2017</span><span class="bt"><i class="b2" style="width:${y.v}%"></i></span><span class="bv">${fmt(y.v)}%</span></div>
      <div class="br" tabindex="0" data-tip="2026: ${fmt(v)}% su ${n}"><span class="bl">2026</span><span class="bt"><i style="width:${n?v:0}%"></i></span><span class="bv">${n?fmt(v)+"%":"-"}</span></div>
@@ -493,10 +497,34 @@ $("#close").onclick=()=>dlg.close();
 function setData(rows,mode){DATA=rows;MODE=mode;F.q="";F.seg="";Object.keys(X).forEach(k=>delete X[k]);buildFilters();render()}
 $("#demo").onclick=()=>{setData(demo(),"demo");dlg.close()};
 $("#files").addEventListener("change",async e=>{
-  const all=[];let skipped=[];
-  for(const f of e.target.files){const t=await f.text();const r=ingest(parseCSV(t),hintFrom(f.name));if(r&&r.length)all.push(...r);else skipped.push(f.name)}
-  if(all.length){setData(all,"real");dlg.close()}
-  $("#dlgmsg").textContent=skipped.length?"Non riconosciuti: "+skipped.join(", ")+". Servono i fogli Q1_Galleria, Q2_Iper, Q3_Mercati.":""});
+  const all=[];
+  const skipped=[];
+  const selected=[...e.target.files];
+
+  for(const f of selected){
+    try{
+      const t=await f.text();
+      const q=hintFrom(f.name);
+      const r=ingest(parseCSV(t),q);
+      if(r && r.length) all.push(...r);
+      else skipped.push(f.name);
+    }catch(err){
+      skipped.push(f.name);
+    }
+  }
+
+  if(all.length){
+    setData(all,"real");
+    dlg.close();
+  }
+
+  $("#dlgmsg").textContent=skipped.length
+    ? "File non riconosciuti o senza risposte: "+skipped.join(", ")+". Controlla che il nome identifichi Q1, Q2 o Q3."
+    : "";
+
+  // Consente di selezionare di nuovo lo stesso file per ripetere il test.
+  e.target.value="";
+});
 $("#go").onclick=async()=>{
   const m=$("#url").value.match(/\/d\/([\w-]+)/);if(!m){$("#dlgmsg").textContent="Link non valido.";return}
   $("#dlgmsg").textContent="Collegamento in corso...";
