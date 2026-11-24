@@ -372,6 +372,7 @@ function dist(code,rows){
       String(r[code]).split(/[,;]\s*/)
     )
   ])].filter(Boolean);
+  
 
   const items=options.map(o=>{
     const c=ans.filter(r=>has(d,r[code],o)).length;
