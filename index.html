@@ -347,9 +347,29 @@ $("#reset").onclick=()=>{F.q="";F.seg="";Object.keys(X).forEach(k=>delete X[k]);
 
 /* ============ Calcoli ============ */
 function dist(code,rows){
-  const d=D[code];const ans=rows.filter(r=>r[code]);const n=ans.length;
-  const items=d.o.map(o=>{const c=ans.filter(r=>has(d,r[code],o)).length;return{l:short(o),full:o,n:c,p:pc(c,n)}});
-  return{items,n}}
+  const d=D[code];
+  const ans=rows.filter(r=>r[code]);
+  const n=ans.length;
+
+  const options = [...new Set([
+    ...(d.o || []),
+    ...ans.flatMap(r =>
+      String(r[code]).split(/[,;]\s*/)
+    )
+  ])].filter(Boolean);
+
+  const items=options.map(o=>{
+    const c=ans.filter(r=>has(d,r[code],o)).length;
+    return{
+      l:short(o),
+      full:o,
+      n:c,
+      p:pc(c,n)
+    };
+  });
+
+  return{items,n};
+}
 function avgGrid(prefix,rows,asp){return asp.map(a=>{const v=rows.map(r=>parseFloat(r[prefix+"|"+a])).filter(x=>!isNaN(x));return{l:a,v:v.length?v.reduce((x,y)=>x+y,0)/v.length:null,n:v.length}})}
 
 /* ============ Disegno ============ */
