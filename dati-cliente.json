@@ -1,0 +1,441 @@
+{
+  "progetto": "Monitor Centurie 2026",
+  "versioneFormato": 1,
+  "modalita": "SIMULAZIONE",
+  "stato": "BOZZA_INTERNA",
+  "pubblicazioneAutorizzata": false,
+  "elaborazione": "2026-11-24T13:30:59.556Z",
+  "sezioni": {
+    "TUTTI": {
+      "titolo": "Quadro generale",
+      "statistiche": {
+        "A1": {
+          "titolo": "A1. Genere",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": true,
+          "distribuzione": [
+            {
+              "risposta": "Donna",
+              "percentuale": 49
+            },
+            {
+              "risposta": "Uomo",
+              "percentuale": 38
+            },
+            {
+              "risposta": "Altro / preferisco non rispondere",
+              "percentuale": 13
+            }
+          ]
+        },
+        "A2": {
+          "titolo": "A2. Fascia d'età",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "A3": {
+          "titolo": "A3. Professione",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "A4": {
+          "titolo": "A4. Comune di residenza",
+          "tipo": "LIST",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "A5": {
+          "titolo": "A5. Titolo di studio",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": true,
+          "distribuzione": [
+            {
+              "risposta": "Laurea triennale / diploma di laurea",
+              "percentuale": 27
+            },
+            {
+              "risposta": "Laurea magistrale o superiore",
+              "percentuale": 27
+            },
+            {
+              "risposta": "Licenza media inferiore",
+              "percentuale": 20
+            },
+            {
+              "risposta": "Diploma di scuola media superiore",
+              "percentuale": 16
+            },
+            {
+              "risposta": "Licenza elementare",
+              "percentuale": 11
+            }
+          ]
+        },
+        "C1": {
+          "titolo": "C1. Con quale frequenza visita il Centro Commerciale Le Centurie?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "C2": {
+          "titolo": "C2. Quanto tempo impiega (o impiegherebbe) da casa per raggiungere Le Centurie?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "C3": {
+          "titolo": "C3. Qual è il motivo principale per cui frequenta Le Centurie? (max 2)",
+          "tipo": "CHECKBOX",
+          "disponibile": true,
+          "distribuzione": [
+            {
+              "risposta": "Passare il tempo / guardare le vetrine",
+              "percentuale": 36
+            },
+            {
+              "risposta": "Spesa all'ipermercato",
+              "percentuale": 31
+            },
+            {
+              "risposta": "Acquisti nei negozi della Galleria (abbigliamento, calzature, ecc.)",
+              "percentuale": 31
+            },
+            {
+              "risposta": "Bar e ristorazione",
+              "percentuale": 24
+            },
+            {
+              "risposta": "Lavoro",
+              "percentuale": 22
+            },
+            {
+              "risposta": "Sbrigare commissioni / ritirare un ordine online",
+              "percentuale": 13
+            },
+            {
+              "risposta": "Non frequento Le Centurie",
+              "percentuale": 0
+            }
+          ]
+        },
+        "C4": {
+          "titolo": "C4. Nel fare acquisti (abbigliamento, calzature, accessori) in quale profilo si riconosce di più?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": true,
+          "distribuzione": [
+            {
+              "risposta": "Tradizionalista: cerco qualità e affidabilità, stile classico, non bado solo al prezzo",
+              "percentuale": 33
+            },
+            {
+              "risposta": "Trendy / innovativo: cerco uno stile unico, originale e d'avanguardia",
+              "percentuale": 31
+            },
+            {
+              "risposta": "Pratico / essenziale: non mi lego ai brand, bado alla funzione e al rapporto prezzo/qualità",
+              "percentuale": 18
+            },
+            {
+              "risposta": "Segue la moda (fashion victim): mi piace essere aggiornato e comprare nei brand del momento",
+              "percentuale": 18
+            }
+          ]
+        },
+        "C5": {
+          "titolo": "C5. Quale affermazione descrive meglio la sua propensione alla spesa?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": true,
+          "distribuzione": [
+            {
+              "risposta": "Spendo tanto / compro poco: pochi articoli ma di marca o di fascia medio-alta",
+              "percentuale": 38
+            },
+            {
+              "risposta": "Spendo poco / compro tanto: cerco occasioni e sconti per riempire il carrello con budget contenuto",
+              "percentuale": 24
+            },
+            {
+              "risposta": "Spendo tanto / compro tanto: alta propensione allo shopping, non bado troppo al budget",
+              "percentuale": 22
+            },
+            {
+              "risposta": "Spendo poco / compro poco: acquisti molto mirati, solo se necessario",
+              "percentuale": 16
+            }
+          ]
+        },
+        "C6": {
+          "titolo": "C6. Come viene a conoscenza di novità, promozioni ed eventi dei centri commerciali? (max 2)",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        }
+      }
+    },
+    "Q1": {
+      "titolo": "Galleria commerciale",
+      "statistiche": {
+        "G1": {
+          "titolo": "G1. Quale mezzo ha utilizzato oggi per venire al Centro?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "G2": {
+          "titolo": "G2. Quanto tempo si è fermato (o pensa di fermarsi) oggi nel Centro?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "G3": {
+          "titolo": "G3. Quanto ha speso indicativamente oggi (o spende mediamente) nel Centro?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "G4": {
+          "titolo": "G4. Se potesse aggiungere un negozio o un servizio nella Galleria, quale sceglierebbe? (max 2)",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "G5": {
+          "titolo": "G5. Quali aggettivi descrivono meglio Le Centurie? (max 2)",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "G6": {
+          "titolo": "G6. Quali sono i principali punti di debolezza del Centro? (max 2)",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "G7": {
+          "titolo": "G7. Le capita di venire alle Centurie solo per mangiare, per un aperitivo o un caffè?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "G8": {
+          "titolo": "G8. Ha mai usato Le Centurie per acquisti online? (locker, ritiro in negozio / click&collect)",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "G9": {
+          "titolo": "G9. Durante la visita usa lo smartphone per il Centro o per i prodotti?",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "G10": {
+          "titolo": "G10. Quanto ritiene importanti i servizi per la sostenibilità (colonnine di ricarica, ecocompattatori, aree verdi)?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "G11": {
+          "titolo": "G11. Quali servizi extra la farebbero frequentare di più il Centro? (max 2)",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "G12": {
+          "titolo": "G12. In occasione di concorsi a premio, cosa preferirebbe ricevere?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": true,
+          "distribuzione": [
+            {
+              "risposta": "Buoni acquisto da spendere nel Centro",
+              "percentuale": 33
+            },
+            {
+              "risposta": "Premi fisici (prodotti, oggettistica)",
+              "percentuale": 0
+            },
+            {
+              "risposta": "Esperienze (cene, weekend, eventi)",
+              "percentuale": 67
+            }
+          ]
+        },
+        "G13": {
+          "titolo": "G13. Se esistesse la Gift Card del Centro, la acquisterebbe per sé o per regalarla?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        }
+      },
+      "indicatori": {},
+      "matrici": {}
+    },
+    "Q2": {
+      "titolo": "Ipermercato",
+      "statistiche": {
+        "I1": {
+          "titolo": "I1. Con quale frequenza fa la spesa in questo ipermercato?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "I2": {
+          "titolo": "I2. Quale quota della sua spesa alimentare fa qui?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "I3": {
+          "titolo": "I3. Dove fa il resto della spesa?",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "I4": {
+          "titolo": "I4. Cosa acquista principalmente qui? (max 2)",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "I5": {
+          "titolo": "I5. Oggi la visita riguarda solo l'ipermercato o anche la Galleria?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "I10": {
+          "titolo": "I10. Carta fedeltà e volantino",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "I11": {
+          "titolo": "I11. Ha mai usato la spesa online, il drive o la consegna a domicilio?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "I12": {
+          "titolo": "I12. Quali servizi vorrebbe trovare all'ipermercato? (max 2)",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "I14": {
+          "titolo": "I14. Se l'ipermercato fosse meno presente o chiudesse, continuerebbe a frequentare la Galleria?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        }
+      },
+      "indicatori": {
+        "soddisfazione": {
+          "disponibile": false,
+          "valore": null
+        },
+        "NPS": {
+          "disponibile": false,
+          "valore": null
+        }
+      },
+      "matrici": {
+        "importanzaSoddisfazione": {
+          "disponibile": false,
+          "valori": []
+        }
+      }
+    },
+    "Q3": {
+      "titolo": "Mercati e concorrenza",
+      "statistiche": {
+        "M2A": {
+          "titolo": "M2a. Quanto spende tipicamente in una visita a questo mercato?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "M2B": {
+          "titolo": "M2b. Cosa acquista principalmente al mercato?",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "M3": {
+          "titolo": "M3. Dove fa di solito gli acquisti non alimentari (abbigliamento, casa, elettronica)?",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "M4": {
+          "titolo": "M4. Quali centri commerciali frequenta oltre a Le Centurie (o al posto suo)?",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "M5B": {
+          "titolo": "M5b. Centro più frequentato: motivo principale",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "M6": {
+          "titolo": "M6. Perché non frequenta Le Centurie, o la frequenta raramente? (max 2)",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "M7": {
+          "titolo": "M7. Cosa dovrebbe avere un centro commerciale per farle cambiare abitudini? (max 2)",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "M9A": {
+          "titolo": "M9a. Con che frequenza acquista online?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "M9B": {
+          "titolo": "M9b. Ha mai usato in un centro commerciale un locker o il ritiro in negozio (click&collect)?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "M10A": {
+          "titolo": "M10a. Quanto ritiene importanti i servizi per la sostenibilità in un centro commerciale?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "M10B": {
+          "titolo": "M10b. Quali servizi extra la farebbero frequentare di più un centro commerciale? (max 2)",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "M11A": {
+          "titolo": "M11a. Conosce il Centro Commerciale Le Centurie?",
+          "tipo": "MULTIPLE_CHOICE",
+          "disponibile": false,
+          "distribuzione": []
+        },
+        "M11C": {
+          "titolo": "M11c. Ha visto o sentito di recente una comunicazione de Le Centurie? Dove?",
+          "tipo": "CHECKBOX",
+          "disponibile": false,
+          "distribuzione": []
+        }
+      },
+      "indicatori": {},
+      "matrici": {
+        "confrontoCentri": {
+          "disponibile": false,
+          "valori": []
+        }
+      }
+    }
+  }
+}
