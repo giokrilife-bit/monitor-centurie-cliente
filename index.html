@@ -313,7 +313,7 @@ function demo(){
   const R=rng(2026);
   const pick=(o,w)=>{const s=w.reduce((a,b)=>a+b,0);let x=R()*s;for(let i=0;i<o.length;i++){x-=w[i];if(x<=0)return o[i]}return o[o.length-1]};
   const multi=(o,w,max)=>{const out=[];const n=1+(R()<.45?1:0);for(let k=0;k<(max||n);k++){if(max&&k>=n)break;const c=pick(o,w);if(!out.includes(c))out.push(c)}return out.join(", ")};
-  const common=["A1","A2","A3","A4","C1","C2","C3","C4","C5","C6","C7","C8"];
+  const common=["A1","A2","A3","A4","C1","C2","C3","C4","C5","C6","C7"];
   const rows=[];
   const mk=(q,n)=>{for(let i=0;i<n;i++){const o={_q:q};const m3=q==="Q3";
     common.forEach(k=>{const d=D[k];const w=(m3&&d.w3)?d.w3:d.w;o[k]=d.m?multi(d.o,w,d.max||2):pick(d.o,w)});
