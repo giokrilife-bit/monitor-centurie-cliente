@@ -5,11 +5,11 @@
   "stato": "OK",
   "modalita": "SIMULAZIONE",
   "pubblicazioneAutorizzata": false,
-  "elaborazione": "2026-11-26T17:54:20.938Z",
+  "elaborazione": "2026-11-26T19:43:12.305Z",
   "dati": {
     "progetto": "Monitor Centurie 2026",
     "modalita": "SIMULAZIONE",
-    "aggiornamento": "2026-11-26T17:54:20.937Z",
+    "aggiornamento": "2026-11-26T19:43:12.305Z",
     "filtri": {},
     "totaleInterviste": 45,
     "kpi": {
@@ -1151,9 +1151,9 @@
         "percentuale": 26.67
       },
       "acq": {
-        "numero": 10,
+        "numero": 16,
         "risposteValide": 30,
-        "percentuale": 33.33
+        "percentuale": 53.33
       }
     },
     "questionari": {
