@@ -56,6 +56,7 @@ nav button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--s1);fo
 .bv{text-align:right;font-variant-numeric:tabular-nums;font-size:12.5px}
 .br:hover,.br:focus-visible{background:color-mix(in srgb,var(--s1) 8%,transparent)}
 .br.click{cursor:pointer;border-radius:4px}
+.profile-card .br{grid-template-columns:minmax(100px,38%) 1fr 90px}
 .br.dim .bt i{opacity:.35} .br.dim .bl,.br.dim .bv{opacity:.6}
 .br.on .bl,.br.on .bv{color:var(--ink);font-weight:600}
 td.click{cursor:pointer} td.cellon{outline:2px solid var(--s1);outline-offset:-2px}
@@ -109,6 +110,7 @@ img{max-width:100%}
     <select id="f-q" aria-label="Questionario" class="hide-pres"></select>
     <select id="f-A2" aria-label="Fascia d'età" class="hide-pres"></select>
     <select id="f-seg" aria-label="Frequenza" class="hide-pres"></select>
+    <select id="f-profilo" aria-label="Profilo comportamentale" class="hide-pres"></select>
     <select id="f-C5" aria-label="Profilo di stile" class="hide-pres"></select>
     <select id="f-C6" aria-label="Propensione alla spesa" class="hide-pres"></select>
     <select id="f-A4" aria-label="Comune" class="hide-pres"></select>
@@ -194,7 +196,8 @@ const nz=s=>String(s||"").toLowerCase().replace(/\s*\/\s*/g,"/").trim();
 const has=(d,v,o)=>d.m?nz(v).includes(nz(o)):(nz(v)===nz(o)||nz(v).startsWith(nz(o)));
 const fmt=x=>(Math.round(x*10)/10).toLocaleString("it-IT",{minimumFractionDigits:0,maximumFractionDigits:1});
 /* ============ Filtri ============ */
-const F={q:"",seg:""};
+const F={q:"",seg:"",profilo:""};
+const PROFILI=["Integrati","Iper orientati","Galleria orientati","Sociali","Funzionali","Non frequentatori"];
 const X={}; // codice domanda -> insieme di risposte scelte (menu e clic sui grafici)
 const XS=["A2","C5","C6","A4"];
 function fillSelect(id,label,vals,map){const s=$(id);const cur=s.value;s.innerHTML=`<option value="">${esc(label)}</option>`+vals.map(v=>`<option value="${esc(v)}">${esc(map?map(v):v)}</option>`).join("");s.value=vals.includes(cur)?cur:""}
@@ -202,25 +205,26 @@ function buildFilters(){
   fillSelect("#f-q","Tutti i questionari",["Q1","Q2","Q3"],v=>"Q"+v[1]+" "+Q_NAME[v]);
   fillSelect("#f-A2","Tutte le età",D.A2.o);
   fillSelect("#f-seg","Tutte le frequenze",["Abituali (almeno settimanale)","Regolari (mensile)","Occasionali","Non frequentatori"]);
+  fillSelect("#f-profilo","Tutti i profili",PROFILI);
   fillSelect("#f-C5","Tutti gli stili",D.C5.o);
   fillSelect("#f-C6","Tutte le propensioni",D.C6.o);
   fillSelect("#f-A4","Tutti i comuni",D.A4.o.slice().sort());
 }
-["q","seg"].forEach(k=>$("#f-"+k).addEventListener("change",e=>{F[k]=e.target.value;refresh()}));
+["q","seg","profilo"].forEach(k=>$("#f-"+k).addEventListener("change",e=>{F[k]=e.target.value;refresh()}));
 XS.forEach(c=>$("#f-"+c).addEventListener("change",e=>{const v=e.target.value;if(v)X[c]=new Set([v]);else delete X[c];refresh()}));
-$("#reset").onclick=()=>{F.q="";F.seg="";Object.keys(X).forEach(k=>delete X[k]);refresh()};
+$("#reset").onclick=()=>{F.q="";F.seg="";F.profilo="";Object.keys(X).forEach(k=>delete X[k]);refresh()};
 
 /* ============ Calcoli ============ */
 const API="https://script.google.com/macros/s/AKfycbxf2DQaRqDEQJNcw3idyPF6u3GZ2jaidKUga48fBQYZ3MzRSZcBifoUclIJEQRHyKLy/exec";
 const MAP={C3:"C2",C4:"C3",C5:"C4",C6:"C5",C7:"C6",G9b:"G9",M1:"M2B",M2:"M3",M3:"M4",M5:"M6",M6:"M7",M8:"M9A"};
 const DIM={A1:"genere",A2:"eta",A3:"professione",A4:"comune",C1:"frequenza",C3:"tempoPercorrenza",C5:"stile",C6:"propensione"};
 let DATA=null, serial=0;
-function filters(){const f={questionario:F.q||"TUTTI"};if(F.seg)f.segmento=F.seg;for(const c in X){const v=[...X[c]];if(DIM[c])f[DIM[c]]=v;else{const k=D[c].m?"risposteMultiple":"risposteSingole";(f[k]??={})[MAP[c]||c]=v;}}return f;}
+function filters(){const f={questionario:F.q||"TUTTI"};if(F.seg)f.segmento=F.seg;if(F.profilo)f.profilo=F.profilo;for(const c in X){const v=[...X[c]];if(DIM[c])f[DIM[c]]=v;else{const k=D[c].m?"risposteMultiple":"risposteSingole";(f[k]??={})[MAP[c]||c]=v;}}return f;}
 function stat(c,graph=true){const q=QOF(c), k=MAP[c]||c;return q?DATA.questionari[q]?.[graph?"statisticheGrafici":"statistiche"]?.[k]:DATA[graph?"comuniGrafici":"comuni"]?.[k];}
 function dist(c){const d=stat(c);return {n:d?.risposteValide||0,items:(d?.distribuzione||[]).map(v=>({l:short(v.risposta),full:v.risposta,n:v.numero,p:v.percentuale??0}))};}
 function pct(v){return v==null?"—":fmt(v)+"%";}
 function avgGrid(prefix,rows,asp){const q=prefix[0]==="I"?"Q2":"Q3",k=({I6a:"I6A",I6b:"I6B",M7a:"M8A",M7b:"M8B"})[prefix];const a=DATA.questionari[q]?.matrici[k]||[];return asp.map(l=>{const v=a.find(x=>x.aspetto===l);return {l,v:v?.media??null,n:v?.risposteValide||0};});}
-async function refresh(){const id=++serial;$("#view").setAttribute("aria-busy","true");$("#src").textContent="Aggiornamento simulazione…";try{const u=new URL(API);u.searchParams.set("azione","statistiche");u.searchParams.set("filtri",JSON.stringify(filters()));const r=await fetch(u,{cache:"no-store",credentials:"omit"});if(!r.ok)throw Error("HTTP");const j=await r.json();if(j.stato!=="OK"||j.modalita!=="SIMULAZIONE"||j.versione!=="2.0"||j.dati?.modalita!=="SIMULAZIONE")throw Error("API");if(id!==serial)return;DATA=j.dati;for(const c of Object.keys(D)){const d=stat(c);if(d)D[c].o=[...new Set([...((F.q||Object.keys(X).length||F.seg)?D[c].o:[]),...d.distribuzione.map(v=>v.risposta)])];}buildFilters();render();}catch(e){if(id!==serial)return;DATA=null;$("#view").innerHTML='<div class="empty">Connessione non riuscita. Premi Aggiorna dati per riprovare.</div>';$("#src").textContent="Connessione non riuscita";}finally{if(id===serial)$("#view").removeAttribute("aria-busy");}}
+async function refresh(){const id=++serial;$("#view").setAttribute("aria-busy","true");$("#src").textContent="Aggiornamento simulazione…";try{const u=new URL(API);u.searchParams.set("azione","statistiche");u.searchParams.set("filtri",JSON.stringify(filters()));const r=await fetch(u,{cache:"no-store",credentials:"omit"});if(!r.ok)throw Error("HTTP");const j=await r.json();if(j.stato!=="OK"||j.modalita!=="SIMULAZIONE"||j.versione!=="2.0"||j.dati?.modalita!=="SIMULAZIONE")throw Error("API");if(id!==serial)return;DATA=j.dati;for(const c of Object.keys(D)){const d=stat(c);if(d)D[c].o=[...new Set([...((F.q||Object.keys(X).length||F.seg||F.profilo)?D[c].o:[]),...d.distribuzione.map(v=>v.risposta)])];}buildFilters();render();}catch(e){if(id!==serial)return;DATA=null;$("#view").innerHTML='<div class="empty">Connessione non riuscita. Premi Aggiorna dati per riprovare.</div>';$("#src").textContent="Connessione non riuscita";}finally{if(id===serial)$("#view").removeAttribute("aria-busy");}}
 /* ============ Disegno ============ */
 function bars(items,n,opt={}){
   if(!n)return'<div class="empty">Nessuna risposta con i filtri scelti</div>';
@@ -232,6 +236,12 @@ function bars(items,n,opt={}){
     return`<div class="br${cl}" tabindex="0"${at} data-tip="${esc(i.full||i.l)}: ${i.n} su ${n} (${fmt(i.p)}%)"><span class="bl">${esc(i.l)}</span><span class="bt"><i style="width:${i.p/max*100}%"></i></span><span class="bv">${fmt(i.p)}%</span></div>`}).join("")}
 const QOF=c=>c[0]==="G"?"Q1":c[0]==="I"?"Q2":c[0]==="M"?"Q3":"";
 function card(title,code,rows,opt){const r=dist(code);const sel=X[code]&&X[code].size?X[code]:null;return`<section class="card"><h3>${esc(title||D[code].t)}</h3><p class="n">${r.n} risposte${r.n&&r.n<30?' <span class="warn">· campione ridotto</span>':""}${D[code].m?" · più risposte possibili":""}</p>${bars(r.items,r.n,Object.assign({},opt,{code,sel}))}</section>`}
+function profileCard(){
+  const d=DATA.profiliClientela;
+  if(!d)return '<section class="card"><h3>Profili comportamentali</h3><p class="note">Distribuzione non disponibile: aggiornare il deploy API.</p></section>';
+  const n=d.risposteValide;
+  return `<section class="card profile-card" style="grid-column:1/-1"><h3>Profili comportamentali</h3><p class="n">${n} interviste classificate · base senza il filtro Profilo${n&&n<30?' · campione ridotto':''}</p>${PROFILI.map(p=>{const v=d.distribuzione.find(x=>x.risposta===p),c=v?.numero??0,pc=v?.percentuale??0,on=F.profilo===p;return `<div class="br click${F.profilo?(on?' on':' dim'):''}" tabindex="0" role="button" aria-pressed="${on}" data-profilo="${esc(p)}" data-tip="${esc(p)}: ${c} su ${n}"><span class="bl">${esc(p)}</span><span class="bt"><i style="width:${pc}%;min-width:0"></i></span><span class="bv">${c} · ${n?fmt(pc)+'%':'—'}</span></div>`}).join('')}</section>`;
+}
 function tile(v,l){return`<div class="kpi"><b>${v}</b><span>${esc(l)}</span></div>`}
 const sub=q=>({length:DATA.questionari[q]?.totaleInterviste||0});
 
@@ -240,14 +250,14 @@ const SECT=[
  {id:"pan",l:"Panoramica",f(rows){
    const k=DATA.kpi;
    return`<div class="kpis">${tile(rows.length.toLocaleString("it-IT"),"interviste")}${tile(pct(k.donne.percentuale),"donne")}${tile(pct(k.abituali.percentuale),"vengono almeno una volta a settimana")}${tile(pct(k.entro15Minuti.percentuale),"abitano entro 15 minuti")}</div>
-   <div class="grid">${card("Fascia d'età","A2",rows)}${card("Frequenza di visita","C1",rows)}${card("Tempo necessario per raggiungere Le Centurie","C3",rows)}${card("Motivo principale della visita","C4",rows)}${card("Canali di informazione","C7",rows)}${card("Professione","A3",rows)}</div>`}},
+   <div class="grid">${profileCard()}${card("Fascia d'età","A2",rows)}${card("Frequenza di visita","C1",rows)}${card("Tempo necessario per raggiungere Le Centurie","C3",rows)}${card("Motivo principale della visita","C4",rows)}${card("Canali di informazione","C7",rows)}${card("Professione","A3",rows)}</div>`}},
  {id:"pro",l:"Profili di consumatore",f(rows){
    const m=DATA.matriceProfili,a=m.stili,b=m.propensioni,ok={length:m.risposteValide};
    const mx=Math.max(1,...m.celle.map(c=>c.numero));
    const tb=`<div class="scroll"><table><thead><tr><th>Stile / Spesa</th>${b.map(y=>`<th>${esc(short(y))}</th>`).join("")}</tr></thead><tbody>${a.map(x=>`<tr><td>${esc(short(x))}</td>${b.map(y=>{const c=m.celle.find(v=>v.stile===x&&v.propensione===y)?.numero||0;return`<td tabindex="0" role="button" class="click${X.C5?.has(x)&&X.C6?.has(y)?" cellon":""}" data-c4="${esc(x)}" data-c5="${esc(y)}" style="background:color-mix(in srgb,var(--s1) ${Math.round(c/mx*45)}%,transparent)" data-tip="${esc(x)} + ${esc(y)}: ${c} intervistati">${c?fmt(pc(c,ok.length))+"%":"-"}</td>`}).join("")}</tr>`).join("")}</tbody></table></div>`;
    const segs=["Abituali (almeno settimanale)","Regolari (mensile)","Occasionali","Non frequentatori"];
    const counts=Object.fromEntries(segs.map(x=>[x,0]));for(const v of DATA.comuniGrafici.C1.distribuzione){const k=({"Ogni giorno":segs[0],"Più volte a settimana":segs[0],"Più volte al mese":segs[1],"Ogni tanto / raramente":segs[2],"Non ci vado mai":segs[3]})[v.risposta];if(k)counts[k]+=v.numero;}const tot=Object.values(counts).reduce((a,b)=>a+b,0);
-   return`<div class="grid">${card("Profilo di stile","C5",rows)}${card("Propensione alla spesa","C6",rows)}
+   return`<div class="grid">${profileCard()}${card("Profilo di stile","C5",rows)}${card("Propensione alla spesa","C6",rows)}
    <section class="card" style="grid-column:1/-1"><h3>Stile e propensione alla spesa</h3><p class="n">${ok.length} intervistati, % sul totale</p>${tb}</section>
    <section class="card" style="grid-column:1/-1"><h3>Segmenti per frequenza di visita</h3><p class="n">${tot} intervistati</p>${bars(segs.map(s=>{const c=counts[s];return{l:s,full:s,n:c,p:pc(c,tot)}}),tot,{seg:1})}</section></div>`}},
  {id:"c17",l:"Confronto 2017",f(rows){
@@ -290,10 +300,11 @@ function render(){
   const ch=[];
   if(F.q)ch.push({k:"q",t:"Questionario",v:"Q"+F.q[1]+" "+Q_NAME[F.q]});
   if(F.seg)ch.push({k:"seg",t:"Frequenza",v:F.seg});
+  if(F.profilo)ch.push({k:"profilo",t:"Profilo",v:F.profilo});
   Object.keys(X).forEach(c=>X[c].forEach(o=>ch.push({k:"x",c,o,t:D[c].t,v:short(o)})));
   $("#chips").innerHTML=ch.map((x,i)=>`<span class="chip">${esc(x.t)}: <b>${esc(x.v)}</b><button type="button" data-rm="${i}" aria-label="Togli filtro ${esc(x.v)}" style="border:0;background:none;padding:0 4px;min-height:0;color:inherit">×</button></span>`).join("");
-  $("#chips").onclick=e=>{const b=e.target.closest("[data-rm]");if(!b)return;const x=ch[+b.dataset.rm];if(x.k==="q")F.q="";else if(x.k==="seg")F.seg="";else{X[x.c].delete(x.o);if(!X[x.c].size)delete X[x.c]}refresh()};
-  ["q","seg"].forEach(k=>{$("#f-"+k).value=F[k]});
+  $("#chips").onclick=e=>{const b=e.target.closest("[data-rm]");if(!b)return;const x=ch[+b.dataset.rm];if(x.k==="q")F.q="";else if(x.k==="seg")F.seg="";else if(x.k==="profilo")F.profilo="";else{X[x.c].delete(x.o);if(!X[x.c].size)delete X[x.c]}refresh()};
+  ["q","seg","profilo"].forEach(k=>{$("#f-"+k).value=F[k]});
   XS.forEach(c=>{$("#f-"+c).value=X[c]&&X[c].size===1?[...X[c]][0]:""});
   $("#pbar").textContent=ch.length?"Filtri attivi: "+ch.map(x=>x.t+": "+x.v).join(" · "):"Tutte le interviste";
   $("#foot").textContent="SIMULAZIONE – NON REALE. Percentuali sulle risposte valide. Aggiornamento: "+new Date(DATA.aggiornamento).toLocaleString("it-IT");
@@ -316,13 +327,14 @@ document.addEventListener("keydown",e=>{if(!document.body.classList.contains("pr
 
 /* clic sui grafici: filtro incrociato su tutta la pagina */
 $("#view").addEventListener("click",e=>{
-  const b=e.target.closest("[data-code],[data-seg],[data-c4]");if(!b||$("#view").getAttribute("aria-busy")==="true")return;
+  const b=e.target.closest("[data-code],[data-seg],[data-c4],[data-profilo]");if(!b||$("#view").getAttribute("aria-busy")==="true")return;
   if(b.dataset.code){const c=b.dataset.code,o=b.dataset.opt;const s=X[c]||(X[c]=new Set());if(s.has(o))s.delete(o);else s.add(o);if(!s.size)delete X[c]}
+  else if(b.dataset.profilo){F.profilo=F.profilo===b.dataset.profilo?"":b.dataset.profilo}
   else if(b.dataset.seg){F.seg=F.seg===b.dataset.seg?"":b.dataset.seg}
   else{const a=b.dataset.c4,c=b.dataset.c5;const same=X.C5&&X.C5.size===1&&X.C5.has(a)&&X.C6&&X.C6.size===1&&X.C6.has(c);
     if(same){delete X.C5;delete X.C6}else{X.C5=new Set([a]);X.C6=new Set([c])}}
   refresh()});
-$("#view").addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-code],[data-seg],[data-c4]")){e.preventDefault();e.target.click()}});
+$("#view").addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-code],[data-seg],[data-c4],[data-profilo]")){e.preventDefault();e.target.click()}});
 
 buildFilters();refresh();
 </script>
